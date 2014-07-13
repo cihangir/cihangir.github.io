@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+    <title>Redisence - User presence in redis</title>
+
+    <meta name="HandheldFriendly" content="True">
+    <meta name="MobileOptimized" content="320">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+    <meta name="description" content="">
+
+    <meta name="twitter:card" content="summary">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Redisence - User presence in redis">
+    <meta property="og:description" content="">
+
+    
+<meta name="twitter:site" content="@cihangirsavas">
+
+
+<meta name="twitter:creator" content="@cihangirsavas">
+
+
+<meta name="google-site-verification" content="">
+
+
+<meta property="fb:admins" content="">
+
+
+    <link href="../favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="../apple-touch-icon-precomposed.png" rel="apple-touch-icon">
+
+    <link href="http://fonts.googleapis.com/" rel="dns-prefetch">
+    <link href="http://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic|Open+Sans:700,400" rel="stylesheet">
+
+    <link rel="stylesheet" href="../assets/css/673ad9ab.main.min.css"/>
+
+    <script src="../assets/js/e427151d.head-scripts.min.js"></script>
+
+    <meta name="generator" content="Ghost 0.3" />
+<link rel="alternate" type="application/rss+xml" title="RSS" href="../rss/index.html">
+  </head>
+  <body class="post-template">
+
+    <nav tabindex="-1" class="drawer">
+  <button data-action="open-drawer" id="drawer-button" class="drawer-button"><i class="fa fa-bars"></i></button>
+  <div class="drawer-container">
+    <!--.drawer-search(role="search")-->
+    <ul role="navigation" class="drawer-list">
+      
+
+<li class="drawer-list-item">
+  <a href="../index.html">
+    <i class="fa fa-home fa-lg fa-fw"></i>Home
+  </a>
+</li>
+<li class="drawer-list-item">
+  <a href="../rss/index.html">
+    <i class="fa fa-rss fa-lg fa-fw"></i>Subscribe to Feed
+  </a>
+</li>
+
+    </ul>
+  </div>
+</nav>
+
+
+    <div class="drawer-overlay"></div>
+    <main id="container" role="main" class="container">
+      <div class="surface">
+        <div class="surface-container">
+          <div data-pjax-container class="content">
+            
+
+<section class="wrapper wrapper-post">
+  <div class="wrapper-container">
+    <article itemscope itemtype="http://schema.org/BlogPosting" role="article" class="post post">
+      
+        <section class="post-container">
+          <header class="post-header">
+            <ul class="post-meta-list">
+              <li class="post-meta-item">
+                <time datetime="2014-06-17" itemprop="datePublished">
+                  a month ago
+                </time>
+              </li>
+              <li class="post-meta-item">
+                
+              </li>
+              <li class="post-meta-item">
+                <a href="index.html#disqus_thread" data-disqus-identifier="2"></a>
+              </li>
+            </ul>
+            <h1 itemprop="name headline" class="post-title"><a href="index.html" itemprop="url" data-pjax title="Redisence - User presence in redis">Redisence - User presence in redis</a></h1>
+            
+            <!--h2 itemprop="about" class="post-subtitle"></h2-->
+          </header>
+          <aside class="post-side">
+            <div class="post-author">
+              
+              <div class="post-author-info">
+                <a href="twitter.com/cihangirsavas" class="post-author-name">
+                  Cihangir
+                </a>
+                <p class="post-author-bio"></p>
+              </div>
+            </div>
+          </aside>
+          <div itemprop="articleBody" class="post-body">
+            <h1 id="redisencegodochttpsgodocorggithubcomsiestaredisencestatuspnghttpsgodocorggithubcomsiestaredisencebuildstatushttpstravisciorgsiestaredisencepnghttpstravisciorgsiestaredisence">Redisence <a href="https://godoc.org/github.com/siesta/redisence"><img src="https://godoc.org/github.com/siesta/redisence?status.png" alt="GoDoc" title="" /></a> <a href="https://travis-ci.org/siesta/redisence"><img src="https://travis-ci.org/siesta/redisence.png" alt="Build Status" title="" /></a></h1>
+
+<h2 id="presenceinredis">Presence in Redis  </h2>
+
+<p>One of the most important and resource intensive operation in chat systems is handling user presence. <br />
+Because in order to start the chat one should provide the presence information. <br />
+And keeping this data up-to-date is another challenge.</p>
+
+<p>There are 3 main parts for handling user presence, <br />
+* Notification
+* Persistency
+* Data source</p>
+
+<h4 id="startingwithnumberone">Starting with number one:</h4>
+
+<p>If we calculate the message count with a standart architecture for sending notifications to the online users: <br />
+count = (online user count) * (channel participant count) * (events), since every part is a <br />
+multiplication even increasing by one will cause huge effects.</p>
+
+<h4 id="numbertwo">Number two:</h4>
+
+<p>Transient presence data should be commited and updated regularly, after an inactive duration presence data should be set to offline <br />
+either by the application or by the persistency layer</p>
+
+<h4 id="numberthree">Number three:</h4>
+
+<p>Online clients should notify the presence system with their unique identifier repeatedly. We can call it as heartbeat.</p>
+
+<p>With this package i am gonna try to handle the persistency layer for user presence.</p>
+
+<p>For usage see examples below or go to godoc page.</p>
+
+<h2 id="installandusage">Install and Usage</h2>
+
+<p>Install the package with:</p>
+
+<pre><code class="bash">go get github.com/siesta/redisence  
+</code></pre>
+
+<p>Import it with:</p>
+
+<pre><code class="go">import "github.com/siesta/redisence"  
+</code></pre>
+
+<h2 id="examples">Examples</h2>
+
+<h4 id="initializationofanewredisence">Initialization of a new Redisence</h4>
+
+<pre><code class="go">// create a presence system
+backend, err := NewRedis(serverAddr, dbNumber, timeoutDuration)  
+if err != nil {  
+    return err
+}
+
+s, err := New(backend)  
+if err != nil {  
+    return err
+}
+</code></pre>
+
+<h4 id="basicoperations">Basic Operations</h4>
+
+<pre><code class="go">// send online presence data to system - user log in
+s.Online("id")  
+s.Online("id2")
+
+
+// send offline presence data to system - user log out
+s.Offline("id")  
+s.Offline("id2")
+
+// get status of some ids
+status, err := s.Status([]string{"id20", "id21"}...)  
+if err != nil {  
+    return err
+}
+
+for _, st := range status {  
+    if st.Status != Offline {
+        //....
+    }
+}
+</code></pre>
+
+<h4 id="listeningforevents">Listening for events</h4>
+
+<pre><code class="go">go func() {  
+    s.Online("id")
+    time.Sleep(time.Second * 1)
+    s.Online("id")
+    s.Online("id2")
+}()
+
+// start listening to them
+for event := range s.ListenStatusChanges() {  
+    switch event.Status {
+    case Online:
+        // ....
+    case Offline:
+        // ....
+    }
+}
+</code></pre>
+
+<h1 id="redisconfiguration">Redis configuration</h1>
+
+<p>To get the events from the redis database we should uptade the redis config with the following data</p>
+
+<p><code>redis-cli config set notify-keyspace-events Ex$</code></p>
+
+<p>Or <br />
+set in redis.conf <br />
+<code>notify-keyspace-events "Ex$"</code></p>
+
+<p>for more info <a href='http://redis.io/topics/notifications'>http://redis.io/topics/notifications</a></p>
+
+<h2 id="license">License</h2>
+
+<p>The MIT License (MIT) - see LICENSE for more details</p>
+          </div>
+          <footer class="post-footer">
+            <div itemprop="author" itemscope itemtype="http://schema.org/Person" class="post-author">
+              
+              <div class="post-author-info">
+                <h4 class="post-footer-heading">Written By</h4>
+                <a href="twitter.com/cihangirsavas" itemprop="url" class="post-author-name">
+                  <span itemprop="name">Cihangir</span>
+                </a>
+                <p itemprop="description" class="post-author-bio"></p>
+              </div>
+            </div>
+            <div class="post-social">
+              <h4 class="post-footer-heading">Spread the word</h4>
+              <a href="index.html#" data-action="share-twitter"><i class="fa fa-fw fa-lg fa-twitter"></i></a>
+              <a href="index.html#" data-action="share-facebook"><i class="fa fa-fw fa-lg fa-facebook"></i></a>
+              <a href="index.html#" data-action="share-gplus"><i class="fa fa-fw fa-lg fa-google-plus"></i></a>
+            </div>
+          </footer>
+        </section>
+      
+      <section itemprop="comment" class="post-comments">
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+          
+var ga_ua = 'UA-46285398-1';
+
+
+var disqus_shortname = 'savasio';
+
+          
+            var disqus_identifier = '2';
+          
+          (function() {
+              var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+              dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+              (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+          })();
+        </script>
+      </section>
+    </article>
+
+    <footer role="contentinfo" class="footer">
+  <p><small>© 2014. All Rights Reserved.</small></p>
+  <p><small><a href="http://ghostium.oswaldoacauan.com/" target="_blank">Ghostium Theme</a> by <a href="http://twitter.com/oswaldoacauan" target="_blank">@oswaldoacauan</a></small></p>
+  <p><small>Proudly published with <a href="http://oswaldoacauan.com" target="_blank">Ghost</a></small></p>
+</footer>
+
+  </div>
+</section>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script src="../shared/vendor/jquery/jquery.js"></script>
+
+    <script src="../assets/js/b785c374.foot-scripts.min.js"></script>
+
+    <script type="text/javascript">
+      
+var ga_ua = 'UA-46285398-1';
+
+
+var disqus_shortname = 'savasio';
+
+
+      (function(g,h,o,s,t,z){g.GoogleAnalyticsObject=s;g[s]||(g[s]=
+      function(){(g[s].q=g[s].q||[]).push(arguments)});g[s].s=+new Date;
+      t=h.createElement(o);z=h.getElementsByTagName(o)[0];
+      t.src='//www.google-analytics.com/analytics.js';
+      z.parentNode.insertBefore(t,z)}(window,document,'script','ga'));
+      ga('create',ga_ua);ga('send','pageview');
+
+      (function () {
+      var s = document.createElement('script'); s.async = true;
+      s.type = 'text/javascript';
+      s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+      (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+      }());
+    </script>
+  </body>
+</html>

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Savas.io]]></title><description><![CDATA[Cihangir's blog.
+Software Eng @ koding.com]]></description><link>http://savas.io</link><generator>NodeJS RSS Module</generator><lastBuildDate>Sun, 13 Jul 2014 08:37:40 GMT</lastBuildDate><atom:link href="http://savas.io/rss/" rel="self" type="application/rss+xml"/><author><![CDATA[Cihangir]]></author><ttl>60</ttl><item><title><![CDATA[Redisence - User presence in redis]]></title><description><![CDATA[<h1 id="redisencegodochttpsgodocorggithubcomsiestaredisencestatuspnghttpsgodocorggithubcomsiestaredisencebuildstatushttpstravisciorgsiestaredisencepnghttpstravisciorgsiestaredisence">Redisence <a href='https://godoc.org/github.com/siesta/redisence' ><img src='https://godoc.org/github.com/siesta/redisence?status.png'  alt="GoDoc" title="" /></a> <a href='https://travis-ci.org/siesta/redisence' ><img src='https://travis-ci.org/siesta/redisence.png'  alt="Build Status" title="" /></a></h1>
+
+<h2 id="presenceinredis">Presence in Redis  </h2>
+
+<p>One of the most important and resource intensive operation in chat systems is handling user presence. <br />
+Because in order to start the chat one should provide the presence information. <br />
+And keeping this data up-to-date is another challenge.</p>
+
+<p>There are 3 main parts for handling user presence, <br />
+* Notification
+* Persistency
+* Data source</p>
+
+<h4 id="startingwithnumberone">Starting with number one:</h4>
+
+<p>If we calculate the message count with a standart architecture for sending notifications to the online users: <br />
+count = (online user count) * (channel participant count) * (events), since every part is a <br />
+multiplication even increasing by one will cause huge effects.</p>
+
+<h4 id="numbertwo">Number two:</h4>
+
+<p>Transient presence data should be commited and updated regularly, after an inactive duration presence data should be set to offline <br />
+either by the application or by the persistency layer</p>
+
+<h4 id="numberthree">Number three:</h4>
+
+<p>Online clients should notify the presence system with their unique identifier repeatedly. We can call it as heartbeat.</p>
+
+<p>With this package i am gonna try to handle the persistency layer for user presence.</p>
+
+<p>For usage see examples below or go to godoc page.</p>
+
+<h2 id="installandusage">Install and Usage</h2>
+
+<p>Install the package with:</p>
+
+<pre><code class="bash">go get github.com/siesta/redisence  
+</code></pre>
+
+<p>Import it with:</p>
+
+<pre><code class="go">import "github.com/siesta/redisence"  
+</code></pre>
+
+<h2 id="examples">Examples</h2>
+
+<h4 id="initializationofanewredisence">Initialization of a new Redisence</h4>
+
+<pre><code class="go">// create a presence system
+backend, err := NewRedis(serverAddr, dbNumber, timeoutDuration)  
+if err != nil {  
+    return err
+}
+
+s, err := New(backend)  
+if err != nil {  
+    return err
+}
+</code></pre>
+
+<h4 id="basicoperations">Basic Operations</h4>
+
+<pre><code class="go">// send online presence data to system - user log in
+s.Online("id")  
+s.Online("id2")
+
+
+// send offline presence data to system - user log out
+s.Offline("id")  
+s.Offline("id2")
+
+// get status of some ids
+status, err := s.Status([]string{"id20", "id21"}...)  
+if err != nil {  
+    return err
+}
+
+for _, st := range status {  
+    if st.Status != Offline {
+        //....
+    }
+}
+</code></pre>
+
+<h4 id="listeningforevents">Listening for events</h4>
+
+<pre><code class="go">go func() {  
+    s.Online("id")
+    time.Sleep(time.Second * 1)
+    s.Online("id")
+    s.Online("id2")
+}()
+
+// start listening to them
+for event := range s.ListenStatusChanges() {  
+    switch event.Status {
+    case Online:
+        // ....
+    case Offline:
+        // ....
+    }
+}
+</code></pre>
+
+<h1 id="redisconfiguration">Redis configuration</h1>
+
+<p>To get the events from the redis database we should uptade the redis config with the following data</p>
+
+<p><code>redis-cli config set notify-keyspace-events Ex$</code></p>
+
+<p>Or <br />
+set in redis.conf <br />
+<code>notify-keyspace-events "Ex$"</code></p>
+
+<p>for more info <a href='http://redis.io/topics/notifications' >http://redis.io/topics/notifications</a></p>
+
+<h2 id="license">License</h2>
+
+<p>The MIT License (MIT) - see LICENSE for more details</p>]]></description><link>http://savas.io/redisence-user-presence-in-redis/</link><guid isPermaLink="false">ff547bfd-f0f7-4eb7-9d64-385d6719de63</guid><dc:creator><![CDATA[Cihangir]]></dc:creator><pubDate>Tue, 17 Jun 2014 05:38:55 GMT</pubDate></item></channel></rss>
